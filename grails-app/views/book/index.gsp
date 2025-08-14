@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<%@ page import="grails.plugin.springsecurity.SpringSecurityService" %>
+<g:set var="springSecurityService" bean="springSecurityService"/>
+<html>
+<head>
+    <title>Books</title>
+    <meta name="layout" content="main">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <asset:stylesheet src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+
+</head>
+<body>
+<div class="container mt-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1><strong>Books in Library</strong></h1>
+        <g:if test="${springSecurityService.isLoggedIn() &&
+                      springSecurityService.currentUser.authorities*.authority.contains('ROLE_LIBRARIAN')}">
+        <g:link action="create" class="btn btn-success">Add New Book</g:link>
+        </g:if>
+    </div>
+
+    <g:if test="${flash.message}">
+        <div class="alert alert-success">${flash.message}</div>
+    </g:if>
+
+    <div>
+        <form action="${createLink(controller: 'book', action: 'findBookByTitle')}" method="get" class="mb-3 row g-2 align-items-center">
+            <label for="title" class="col-auto col-form-label"><strong>Title:</strong></label>
+            <div class="col-auto">
+                <input type="text" id="title", name="title" class="form-control">
+            </div>
+            <div class="col-auto">
+                <button type="submit" class="btn btn-outline-primary">Search by Title</button>
+            </div>
+        </form>
+    </div>
+
+    <div>
+        <g:link action="availabilityFilter" class="btn btn-sm btn-secondary">Filter By Availability</g:link>
+
+        <g:link action="myBorrowedFilter" class="btn btn-sm btn-secondary">My Borrowed Books</g:link>
+
+        <g:if test="${filtered}">
+            <g:link controller="book" action="index" class="btn-close" aria-label="Close">
+                <i class="bi bi-x-lg"></i>
+            </g:link>
+        </g:if>
+
+    </div>
+
+    <div class="table-responsive">
+        <table class="table table-bordered table-striped align-middle">
+            <thead class="table-light">
+            <tr>
+                <th>Title</th>
+                <th>Author</th>
+                <th>ISBN</th>
+                <th>Available</th>
+                <th>Actions</th>
+            </tr>
+            </thead>
+            <tbody>
+            <g:each in="${books}" var="book">
+                <tr>
+                    <td>
+                        <g:link action="show" id="${book.id}" class="text-decoration-none">
+                            ${book.title}
+                        </g:link>
+                    </td>
+                    <td>${book.author}</td>
+                    <td>${book.isbn}</td>
+                    <td>
+                        <span class="badge ${book.isAvailable ? 'bg-success' : 'bg-danger'}">
+                            ${book.isAvailable ? 'Yes' : 'No'}
+                        </span>
+                    </td>
+                    <td>
+                        <div class="d-flex flex-wrap gap-2">
+                            <g:if test="${book.isAvailable}">
+                                <g:link action="borrow" id="${book.id}" class="btn btn-sm btn-primary">
+                                    Borrow
+                                </g:link>
+                            </g:if>
+                            <g:if test="${!book.isAvailable}">
+                                <g:link action="returnBook" id="${book.id}" class="btn btn-sm btn-warning">
+                                    Return
+                                </g:link>
+                            </g:if>
+
+                            <g:link action="edit" id="${book.id}" class="btn btn-sm btn-secondary">
+                                Edit
+                            </g:link>
+
+                            <g:form action="delete" method="POST" class="d-inline">
+                                <g:hiddenField name="id" value="${book.id}" />
+                                <g:submitButton name="delete" value="Delete" class="btn btn-sm btn-danger"
+                                                onclick="return confirm('Are you sure?')" />
+                            </g:form>
+                        </div>
+                    </td>
+                </tr>
+            </g:each>
+            </tbody>
+        </table>
+        <g:paginate total="${total}" />
+    </div>
+</div>
+</body>
+</html>
