@@ -10,6 +10,7 @@ class UrlMappings {
         }
 
         "/api/books"(controller: 'bookApi')
+        "/api/googleBooks"(controller: 'bookApi', action: 'loadGoogleApiBooks', method: 'GET')
 
         "/"(view:"/index")
         "500"(view:'/error')

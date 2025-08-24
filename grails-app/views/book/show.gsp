@@ -20,6 +20,11 @@
             </span>
         </p>
 
+
+        <g:if test="${book.type == 'digital' && book.file}">
+            <a href="${createLink(action:'downloadFile', id:book.id)}" class="btn btn-outline-primary">Download PDF</a>
+        </g:if>
+        <g:else>
         <div class="mt-3">
             <g:if test="${book.isAvailable}">
                 <g:link action="borrow" id="${book.id}" class="btn btn-primary">Borrow this book</g:link>
@@ -28,6 +33,7 @@
                 <g:link action="returnBook" id="${book.id}" class="btn btn-warning">Return this book</g:link>
             </g:if>
         </div>
+        </g:else>
     </div>
 </div>
 

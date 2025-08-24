@@ -7,8 +7,15 @@ import grails.plugin.springsecurity.annotation.Secured
 class BookApiController extends RestfulController<Book> {
     static responseFormats = ['json', 'xml']
 
+    BookService bookService
+
     BookApiController() {
         super(Book)
+    }
+
+    def loadGoogleApiBooks(){
+        def list = bookService.loadGoogleApiBooks()
+        respond list, formats: ['json']
     }
 
 }

@@ -81,6 +81,7 @@ dependencies {
     implementation "org.quartz-scheduler:quartz:2.3.2"
     implementation 'org.grails.plugins:spring-security-rest:5.0.1'
     implementation 'org.grails.plugins:spring-security-rest:5.0.1'
+    implementation 'org.apache.poi:poi-ooxml:5.2.5'
 }
 
 bootRun {

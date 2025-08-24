@@ -20,7 +20,7 @@ grails.plugin.springsecurity.controllerAnnotations.staticRules = [
 	[pattern: '/**/favicon.ico', access: ['permitAll']],
 	[pattern: '/register/**',    access: ['permitAll']],
 	[pattern: '/register',       access: ['permitAll']],
-	[pattern: '/library/findBookByTitle',       access: ['ROLE_STUDENT', 'ROLE_LIBRARIAN']]
+	[pattern: '/library/findBookByTitle',       access: ['ROLE_STUDENT', 'ROLE_LIBRARIAN']],
 	//[pattern: '/api/books/**', access: ['permitAll']],
 	//[pattern: '/api/**', access: ['permitAll']], // Optional broader rule
 	//[pattern: '/**',          access: ['IS_AUTHENTICATED_ANONYMOUSLY']] // fallback

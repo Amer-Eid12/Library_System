@@ -9,6 +9,9 @@ class Book {
     String isbn
     String author
     boolean isAvailable
+    String type
+    byte[] file
+
 
     static belongsTo= [library: Library, borrowedBy: Student]
 
@@ -26,6 +29,15 @@ class Book {
         author blank: false
         isAvailable default:true
         borrowedBy nullable: true
+        type inList: ['physical', 'digital'], blank: false
+        file nullable: true, maxSize: 10 * 1024 * 1024, validator: { val, obj ->
+            if (obj.type == 'digital' && !val) {
+                return 'file.required.for.digital.books'
+            }
+            if (obj.type == 'physical' && val) {
+                return 'file.not.allowed.for.physical.books'
+            }
+        }
     }
 
     @Override
@@ -36,5 +48,9 @@ class Book {
                 ", author='" + author + '\'' +
                 ", isAvailable=" + isAvailable +
                 '}';
+    }
+
+    static mapping = {
+        file sqlType: 'LONGBLOB'
     }
 }

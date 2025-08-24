@@ -5,10 +5,15 @@ import groovy.json.JsonSlurper
 
 class BootStrap {
     def grailsApplication
+    BookService bookService
 
 
     def init = { servletContext ->
-        //initializeData()
+        /*def list = bookService.loadGoogleApiBooks()
+        println(list.size())
+        for (Book book: list){
+            println(book)
+        }*/
     }
 
     @Transactional

@@ -31,6 +31,20 @@ class BookController  {
         [book: book]
     }
 
+
+    def downloadFile(Long id) {
+    def book = Book.get(id)
+    if (!book || book.type != 'digital' || !book.file) {
+        flash.message = "No file available for download."
+        redirect(action: "show", id: id)
+        return
+    }
+    response.setContentType("application/pdf")
+    response.setHeader("Content-Disposition", "attachment; filename=\"${book.title?.replaceAll(/\s+/, '_') ?: 'book'}.pdf\"")
+    response.outputStream << book.file
+    response.outputStream.flush()
+    }
+
     /*def show(String id) {
         def apiBooks = bookService.loadGoogleApiBooks()
         def index = 0
@@ -90,6 +104,40 @@ class BookController  {
         def total = Book.executeQuery(
                 "SELECT count(b) FROM Book b WHERE b.borrowedBy = :studentId",
                 [studentId: currentStudent]
+        )[0]
+
+        render(view: 'index', model: [books: books, filtered: true, total: total])
+    }
+
+    def physicalFilter(){
+        params.max = 10
+        params.offset = params.int('offset') ?: 0
+
+        def books = Book.executeQuery(
+                "FROM Book b WHERE b.type = 'physical'",
+                [],
+                [max: params.max, offset: params.offset]
+        )
+
+        def total = Book.executeQuery(
+                "SELECT count(b) FROM Book b WHERE b.type = 'physical'"
+        )[0]
+
+        render(view: 'index', model: [books: books, filtered: true, total: total])
+    }
+
+    def digitalFilter(){
+        params.max = 10
+        params.offset = params.int('offset') ?: 0
+
+        def books = Book.executeQuery(
+                "FROM Book b WHERE b.type = 'digital'",
+                [],
+                [max: params.max, offset: params.offset]
+        )
+
+        def total = Book.executeQuery(
+                "SELECT count(b) FROM Book b WHERE b.type = 'digital'"
         )[0]
 
         render(view: 'index', model: [books: books, filtered: true, total: total])
@@ -161,6 +209,16 @@ class BookController  {
     @Transactional
     def save() {
         def book = new Book(params)
+
+        def uploadedFile = request.getFile('file')
+        if (book.type == 'digital' && uploadedFile && !uploadedFile.empty) {
+            if (uploadedFile.contentType == 'application/pdf') {
+                book.file = uploadedFile.bytes
+            } else {
+                book.errors.rejectValue('file', 'file.not.pdf', 'Only PDF files are allowed.')
+            }
+        }
+
         if (!book.validate()) {
             flash.message = "Please correct the errors below"
             render(view: "create", model: [book: book])
@@ -237,4 +295,5 @@ class BookController  {
             redirect(action: "index")
         }
     }
+
 }

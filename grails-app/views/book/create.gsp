@@ -14,7 +14,7 @@
         <div class="alert alert-warning">${flash.message}</div>
     </g:if>
 
-    <g:form action="save" method="post" class="needs-validation" novalidate="">
+    <g:form action="save" method="post" class="needs-validation" novalidate="" enctype="multipart/form-data">
         <div class="mb-3">
             <label for="title" class="form-label">Title</label>
             <g:textField name="title" value="${book?.title}" class="form-control" required="true" />
@@ -38,6 +38,27 @@
                 <div class="text-danger">${book.errors.getFieldError('isbn').defaultMessage}</div>
             </g:if>
         </div>
+
+        <div class="mb-3">
+    <label for="type" class="form-label">Type</label>
+    <g:select name="type"
+              id="type"
+              from="${['physical', 'digital']}"
+              value="${book?.type}"
+              noSelection="['':'-- Select Type --']"
+              class="form-select"
+              required="true" />
+    <g:if test="${book?.errors?.hasFieldErrors('type')}">
+        <div class="text-danger">${book.errors.getFieldError('type').defaultMessage}</div>
+    </g:if>
+
+    <div id="fileInputDiv" style="display:none;">
+        <input type="file" name="file" class="form-control mt-2" accept="application/pdf" />
+        <g:if test="${book?.errors?.hasFieldErrors('file')}">
+            <div class="text-danger">${book.errors.getFieldError('file').defaultMessage}</div>
+        </g:if>
+    </div>
+</div>
 
         <div class="mb-3">
             <label for="library" class="form-label">Library</label>
@@ -76,6 +97,20 @@
 
             isbnInput.value = formatted;
         });
+
+        const typeSelect = document.getElementById("type");
+        const fileInputDiv = document.getElementById("fileInputDiv");
+
+        function toggleFileInput() {
+            if (typeSelect.value === "digital") {
+                fileInputDiv.style.display = "block";
+            } else {
+                fileInputDiv.style.display = "none";
+            }
+        }
+
+        typeSelect.addEventListener("change", toggleFileInput);
+        toggleFileInput(); 
     });
 </script>
 
