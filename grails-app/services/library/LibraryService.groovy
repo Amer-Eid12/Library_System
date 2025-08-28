@@ -1,5 +1,6 @@
 package library
 
+import grails.converters.JSON
 import grails.gorm.transactions.Transactional
 
 @Transactional
@@ -21,14 +22,14 @@ class LibraryService {
         }
     }
 
-    def findBookByTitle(String title) {
+    /*def findBookByTitle(String title) {
         def book = Book.executeQuery(
                 "SELECT b FROM Book b WHERE b.title = :title",
                 [title: title],
                 [max: 10, offset: 0]
         )
         return book
-    }
+    }*/
 
     def findBookByIsbn(String isbn) {
         return Book.findByIsbn(isbn)

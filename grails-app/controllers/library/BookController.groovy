@@ -1,4 +1,6 @@
 package library
+
+import grails.converters.JSON
 import grails.gorm.transactions.Transactional
 import grails.plugin.springsecurity.SpringSecurityService
 import grails.plugin.springsecurity.annotation.Secured
@@ -43,6 +45,10 @@ class BookController  {
     response.setHeader("Content-Disposition", "attachment; filename=\"${book.title?.replaceAll(/\s+/, '_') ?: 'book'}.pdf\"")
     response.outputStream << book.file
     response.outputStream.flush()
+    }
+
+    def loadAnotherIndex(){
+        redirect(url: "http://localhost:8081/#")
     }
 
     /*def show(String id) {
@@ -281,19 +287,20 @@ class BookController  {
     }
 
     def findBookByTitle() {
-        def title = params.title
-        def book = libraryService.findBookByTitle(title)
-        def total = Book.executeQuery(
-                "SELECT count(b) FROM Book b WHERE b.title = :title",
-                [title: title]
-        )[0]
+        String query = params.q ?: ""
+        def results = Book.findAllByTitleIlike("%${query}%", [max: 10])
 
-        if (book) {
-            render(view: "index", model: [books: book, total: total, filtered: true])
-        } else {
-            flash.message = "Book not found"
-            redirect(action: "index")
+        def books = results.collect { book ->
+            [
+                    id: book.id,
+                    title: book.title,
+                    author: book.author,
+                    isbn: book.isbn,
+                    isAvailable: book.isAvailable
+            ]
         }
+
+        render books as JSON
     }
 
 }

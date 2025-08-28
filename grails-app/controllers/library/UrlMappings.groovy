@@ -11,6 +11,8 @@ class UrlMappings {
 
         "/api/books"(controller: 'bookApi')
         "/api/googleBooks"(controller: 'bookApi', action: 'loadGoogleApiBooks', method: 'GET')
+        "/book/search"(controller: "book", action: "findBookByTitle")
+        "/api/getBooks"(controller: "bookApi", action: "getBooks", method: 'GET')
 
         "/"(view:"/index")
         "500"(view:'/error')
